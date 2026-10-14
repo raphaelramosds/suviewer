@@ -49,19 +49,19 @@ The Makefile builds the PyInstaller executable, prepares `AppDir`, downloads
 the generic PNG icon, downloads `appimagetool` when needed, and creates:
 
 ```text
-DiffSeisViewer-$(uname -m).AppImage
+SUviewer-$(uname -m).AppImage
 ```
 
 For an x86_64 machine, the output is:
 
 ```text
-DiffSeisViewer-x86_64.AppImage
+SUviewer-x86_64.AppImage
 ```
 
 Run it with:
 
 ```bash
-./DiffSeisViewer-x86_64.AppImage
+./SUviewer-x86_64.AppImage
 ```
 
 ## Compatibility and runtime requirements
