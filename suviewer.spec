@@ -2,7 +2,7 @@
 
 
 a = Analysis(
-    ['app.py'],
+    ['suviewer/app.py'],
     pathex=[],
     binaries=[],
     datas=[],

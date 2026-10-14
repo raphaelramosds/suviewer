@@ -39,7 +39,7 @@ python -m pip install --upgrade pip pyinstaller
 
 ## Build the AppImage
 
-Run the command from this directory:
+Run the command from the repository root:
 
 ```bash
 make deploy
