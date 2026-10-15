@@ -24,3 +24,12 @@ Install Seismic Unix first and ensure `suximage` is available on your `PATH`, th
 ```bash
 python suviewer/app.py
 ```
+
+## Displaying multiple images
+
+Click **Add files...** and select one or more `.su` files (use Ctrl/Shift while
+selecting). Each selected file is opened in its own `suximage` window when you
+click **Display with suximage**. You can add more files without closing the
+windows that are already open. Use **Remove selected** or **Clear files** to
+manage the list. Click **Close all images** to close every open `suximage`
+window at once.

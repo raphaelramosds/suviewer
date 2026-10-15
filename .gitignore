@@ -4,3 +4,5 @@ build
 AppDir
 *AppImage
 appimagetool
+__pycache__
+examples/data
