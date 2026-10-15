@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import math
 import shutil
 import subprocess
 import tkinter as tk
@@ -18,13 +19,14 @@ class SUImageViewer:
         self.process: Optional[subprocess.Popen[bytes]] = None
         self.input_file = None
         self.file_var = tk.StringVar()
+        self.perc_var = tk.StringVar(value="99")
         self.status_var = tk.StringVar(value="Select a .su file to display.")
         self.surange_text = None
         self._build_window()
 
     def _build_window(self) -> None:
         self.root.title("SU Image Viewer")
-        self.root.minsize(560, 150)
+        self.root.minsize(560, 190)
         self.root.protocol("WM_DELETE_WINDOW", self.close)
 
         frame = ttk.Frame(self.root, padding=16)
@@ -42,18 +44,29 @@ class SUImageViewer:
         ttk.Button(frame, text="Browse...", command=self.choose_file).grid(
             row=1, column=1, sticky="ew", pady=(4, 12)
         )
+        ttk.Label(frame, text="Amplitude percentile (perc):").grid(
+            row=2, column=0, sticky="w", pady=(0, 12)
+        )
+        ttk.Spinbox(
+            frame,
+            from_=0.01,
+            to=100,
+            increment=0.5,
+            textvariable=self.perc_var,
+            width=10,
+        ).grid(row=2, column=1, sticky="w", pady=(0, 12))
         ttk.Button(frame, text="Display with suximage", command=self.display).grid(
-            row=2, column=0, columnspan=2, sticky="ew"
+            row=3, column=0, columnspan=2, sticky="ew"
         )
         ttk.Label(frame, textvariable=self.status_var).grid(
-            row=3, column=0, columnspan=2, sticky="w", pady=(12, 0)
-        )
-        ttk.Label(frame, text="surange:").grid(
             row=4, column=0, columnspan=2, sticky="w", pady=(12, 0)
         )
+        ttk.Label(frame, text="surange:").grid(
+            row=5, column=0, columnspan=2, sticky="w", pady=(12, 0)
+        )
         self.surange_text = tk.Text(frame, height=5, width=70, state="disabled")
-        self.surange_text.grid(row=5, column=0, columnspan=2, sticky="nsew")
-        frame.rowconfigure(5, weight=1)
+        self.surange_text.grid(row=6, column=0, columnspan=2, sticky="nsew")
+        frame.rowconfigure(6, weight=1)
 
     def choose_file(self) -> None:
         path = filedialog.askopenfilename(
@@ -95,10 +108,30 @@ class SUImageViewer:
         self.surange_text.insert("1.0", text)
         self.surange_text.configure(state="disabled")
 
+    def _get_perc(self) -> Optional[str]:
+        try:
+            perc = float(self.perc_var.get())
+        except ValueError:
+            messagebox.showerror(
+                "Invalid percentile",
+                "Enter a number greater than 0 and no greater than 100.",
+            )
+            return None
+        if not math.isfinite(perc) or not 0 < perc <= 100:
+            messagebox.showerror(
+                "Invalid percentile",
+                "Enter a number greater than 0 and no greater than 100.",
+            )
+            return None
+        return f"{perc:g}"
+
     def display(self) -> None:
         path = Path(self.file_var.get()).expanduser()
         if not path.is_file():
             messagebox.showerror("File not found", f"Could not find:\n{path}")
+            return
+        perc = self._get_perc()
+        if perc is None:
             return
         self.inspect(path)
         if shutil.which("suximage") is None:
@@ -114,7 +147,7 @@ class SUImageViewer:
         try:
             self.input_file = path.open("rb")
             self.process = subprocess.Popen(
-                ["suximage"],
+                ["suximage", f"perc={perc}"],
                 stdin=self.input_file,
                 stdout=subprocess.DEVNULL,
                 stderr=subprocess.DEVNULL,
